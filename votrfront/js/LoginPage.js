@@ -164,12 +164,9 @@ export class LoginPage extends React.Component {
         </div>
       </div>
       <div className="login-content">
-        <p>
-          <strong>Votr</strong> ponúka študentom jednoduchší a pohodlnejší
-          spôsob, ako robiť najčastejšie činnosti zo systému AIS. Zapíšte sa na
-          skúšky, prezrite si vaše hodnotenia a skontrolujte si počet kreditov
-          bez zbytočného klikania.
-        </p>
+        <h2 style={{ color: 'red'}}><strong>Votr </strong> 
+je momentálne nedostupný a náš tím pracuje na jeho obnove. Ak sa chcete prihlásiť
+na skúšku alebo pozrieť priebežné hodnotenie, využite zatiaľ AIS.</h2>
         <hr />
         <LoginForm onOpenError={this.openError} />
       </div>
