@@ -33,7 +33,7 @@ class Context:
         self.connection = requests.Session()
         for key in cookies:
             self.connection.cookies.set(key, cookies[key])
-        self.connection.headers.update({'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Ubuntu Chromium/59.0.3071.109 Chrome/59.0.3071.109 Safari/537.36'})
+        self.connection.headers.update({'User-Agent': 'User-Agent: Mozilla/5.0 (Windows NT 6.1; Trident/7.0; rv:11.0) like Gecko'})
 
     def request_ais(self, url, *, method='GET', **kwargs):
         '''Sends a request to AIS and returns the :class:`requests.Response`.
