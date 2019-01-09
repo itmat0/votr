@@ -85,6 +85,8 @@ _useless_res = [
     re.compile(r'^if \(\w+!=null\) \w+\.tryAutosize\(\)$'),
     re.compile(r'^var componentsProperties = \{\}$'),
     re.compile(r'^dm\(\)\.setActiveDialogName\(\'\w+\'\)$'),
+    re.compile(r'^dm\(\)\.setActiveDialogName\(\'\w+\'\)$'),
+    re.compile(r'^dm\(\).prepareBrowserForDialogsOpen\(showDlgProperties\)$'),
     # TODO: Perhaps we should handle setActiveDialogName, or at least check if
     # it's the same as the current active dialog.
 ]
@@ -94,13 +96,15 @@ _update_re = re.compile(r'^f\(\)\.getControlById\("(\w+)", *(\w+)\)\.(\w+)\((.*)
 _dialog_update_re = re.compile(r'^(\w+)\.getDialogJSObject\(\)\.(\w+)\((.*)\)$')
 
 
-def _parse_args(args_str):
+def _parse_args(args_str, context_args):
     # args_str are WebUI's arguments for a JavaScript function call. We want to
     # parse it with our JSON parser. But WebUI needlessly escapes apostrophes,
     # and `\'` is not a valid escape in JSON. So we replace `\'` with `'`. But
     # we don't want to touch `\\'`, because that's a valid escape sequence
     # followed by a normal apostrophe. We solve this by temporarily replacing
     # `\\` with an invalid character, ensuring that `\'` is captured correctly.
+    if args_str in context_args:
+        args_str = context_args[args_str][0]
     args_str = (args_str
         .replace('\\\\', '\x00')
         .replace('\\\'', '\'')
@@ -137,6 +141,7 @@ def parse_response(soup):
         raise AISParseError("Unexpected script in result frame response")
 
     in_main = False
+    context_vars = {}
 
     for r in _multiline_res:
         script = r.sub('', script)
@@ -160,13 +165,21 @@ def parse_response(soup):
             in_main = False
             continue
 
+        h = re.compile(r'var showDlgProperties = \[(.*?)\]')
+        match = h.match(line)
+        if match:
+            context_vars['showDlgProperties'] = match.groups()
+            print(context_vars)
+            continue
+
         if not in_main:
+            print(line)
             raise AISParseError("Unexpected line out of main() or main0()")
 
         match = _operation_re.match(line)
         if match:
             target, method, args_str = match.groups()
-            args = _parse_args(args_str)
+            args = _parse_args(args_str, context_vars)
             if method not in known_operations[target]:
                 raise AISParseError("Unknown method {}().{}()".format(
                     target, method))
