@@ -394,7 +394,10 @@ class Application:
 
         # WebUIServlet needs charset set in Content-Type. Normal POST requests
         # don't have it, but request.html manually sets it, so we do the same.
-        headers = {'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'}
+        headers = {
+            'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+            'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Ubuntu Chromium/59.0.3071.109 Chrome/59.0.3071.109 Safari/537.36'
+        }
         return self.ctx.request_html('/ais/servlets/WebUIServlet',
             method='POST', params=params, data=data, headers=headers)
 
